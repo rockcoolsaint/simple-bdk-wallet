@@ -1,8 +1,37 @@
 use bdk::bitcoin::Network;
+use bdk::bitcoin::secp256k1::Secp256k1;
+use bdk::bitcoin::util::bip32::{DerivationPath, KeySource};
+use bdk::bitcoin::Amount;
+use bdk::bitcoincore_rpc::{Auth as rpc_auth, Client, RpcApi};
+
+use bdk::blockchain::rpc::{Auth, RpcBlockchain, RpcConfig, wallet_name_from_descriptor};
+use bdk::blockchain::{ConfigurableBlockchain, NoopProgress};
+
+use bdk::keys::bip39::{Mnemonic, Language, MnemonicType};
+use bdk::keys::{GeneratedKey, GeneratableKey, ExtendedKey, DerivableKey, DescriptorKey};
+use bdk::keys::DescriptorKey::Secret;
+
+use bdk::miniscript::miniscript::Segwitv0;
+
+use bdk::Wallet;
+use bdk::wallet::{AddressIndex, signer::SignOptions};
+
+use bdk::sled;
+
 use std::str::FromStr;
 
 fn main() {
-    println!("Hello, world!");
+    let (receive_desc, change_desc) = get_descriptors();
+    println!("recv: {:#?}, \nchng: {:#?}", receive_desc, change_desc);
+
+    // Create a RPC interface
+    let rpc_auth = rpc_auth::UserPass(
+        "bitcoin".to_string(),
+        "bitcoin".to_string()
+    );
+
+    let core_rpc = Client::new("http://127.0.0.1:18443/wallet/test".to_string(), rpc_auth).unwrap();
+    println!("{:#?}", core_rpc.get_blockchain_info().unwrap());
 }
 
 // generate fresh descriptor strings and return them via (receive, change) tuple
