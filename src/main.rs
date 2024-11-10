@@ -89,8 +89,14 @@ fn main() {
     // Combine everything and finally create the BDK wallet structure
     let wallet = Wallet::new(&receive_desc, Some(&change_desc), Network::Regtest, db_tree, blockchain).unwrap();
 
-    // Sync the wallet
-    wallet.sync(NoopProgress, None).unwrap();
+    // // Sync the wallet
+    // wallet.sync(NoopProgress, None).unwrap();
+    
+    // Rescan the blockchain for transactions related to this wallet
+    match core_rpc.rescan_blockchain(None, None) {
+        Ok((start_height, end_height)) => println!("Rescan completed from block {} to {}", start_height, end_height.unwrap_or_default()),
+        Err(e) => eprintln!("Error rescanning blockchain: {:?}", e),
+    }
 
     // Fetch a fresh address to receive coins
     let address = wallet.get_address(AddressIndex::New).unwrap().address;
@@ -107,8 +113,14 @@ fn main() {
     // Confirm transaction by generating some blocks
     core_rpc.generate_to_address(1, &core_address).unwrap();
 
-    // Sync the BDK wallet
-    wallet.sync(NoopProgress, None).unwrap();
+    // // Sync the BDK wallet
+    // wallet.sync(NoopProgress, None).unwrap();
+
+    // Rescan the blockchain for transactions related to this wallet
+    match core_rpc.rescan_blockchain(None, None) {
+        Ok((start_height, end_height)) => println!("Rescan completed from block {} to {}", start_height, end_height.unwrap_or_default()),
+        Err(e) => eprintln!("Error rescanning blockchain: {:?}", e),
+    }
 
     // Create a transaction builder
     let mut tx_builder = wallet.build_tx();
@@ -137,8 +149,14 @@ fn main() {
     // Confirm transaction by generating some blocks
     core_rpc.generate_to_address(1, &core_address).unwrap();
 
-    // Sync the BDK wallet
-    wallet.sync(NoopProgress, None).unwrap();
+    // // Sync the BDK wallet
+    // wallet.sync(NoopProgress, None).unwrap();
+
+    // Rescan the blockchain for transactions related to this wallet
+    match core_rpc.rescan_blockchain(None, None) {
+        Ok((start_height, end_height)) => println!("Rescan completed from block {} to {}", start_height, end_height.unwrap_or_default()),
+        Err(e) => eprintln!("Error rescanning blockchain: {:?}", e),
+    }
 
     // Fetch and display wallet balances
     let core_balance = core_rpc.get_balance(None, None).unwrap();
